@@ -1,0 +1,101 @@
+{
+  "name": "vscode-macaulay2",
+  "displayName": "Macaulay2",
+  "description": "Macaulay2 language support powered by m2-ls",
+  "version": "0.1.0",
+  "publisher": "alexandergolys",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlexanderGolys/vscode-macaulay2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AlexanderGolys/vscode-macaulay2/issues"
+  },
+  "homepage": "https://github.com/AlexanderGolys/vscode-macaulay2#readme",
+  "engines": {
+    "vscode": "^1.91.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "Macaulay2",
+    "LSP",
+    "Tree-sitter"
+  ],
+  "activationEvents": [
+    "onLanguage:macaulay2"
+  ],
+  "main": "./dist/extension.js",
+  "extensionKind": [
+    "workspace"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "macaulay2",
+        "aliases": [
+          "Macaulay2",
+          "M2"
+        ],
+        "extensions": [
+          ".m2"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configuration": {
+      "title": "Macaulay2",
+      "properties": {
+        "macaulay2.server.path": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "description": "Path to m2-ls. Leave empty to use the bundled server or m2-ls from PATH."
+        },
+        "macaulay2.server.arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "machine-overridable",
+          "description": "Additional arguments passed to m2-ls."
+        },
+        "macaulay2.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "scope": "window",
+          "description": "Trace communication between VS Code and m2-ls."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "compile": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js --sourcemap",
+    "watch": "npm run compile -- --watch",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "bundle:server": "node scripts/bundle-server.mjs",
+    "package:vsix": "npm run bundle:server && vsce package --no-dependencies",
+    "vscode:prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.91.0",
+    "@vscode/vsce": "^3.9.2",
+    "esbuild": "^0.25.0",
+    "vscode-languageclient": "^10.1.0",
+    "typescript": "^5.9.3"
+  },
+  "serverBundle": {
+    "serverCrate": "m2-ls",
+    "serverVersion": "0.1.0"
+  }
+}

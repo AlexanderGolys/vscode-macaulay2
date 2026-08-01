@@ -1,0 +1,10 @@
+node_modules/
+dist/
+bin/
+*.vsix
+*.log
+
+# Local agent guidance and state
+AGENTS.md
+.agents/
+.codex/
