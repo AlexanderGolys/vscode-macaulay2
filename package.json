@@ -282,7 +282,7 @@
     "try": "npm run compile && npm run compile:test && node dist/test/openEditor.js",
     "bundle:server": "node scripts/bundle-server.mjs && npm run sync:settings",
     "sync:settings": "node scripts/sync-diagnostic-rules.mjs",
-    "package:vsix": "npm run bundle:server && vsce package --no-dependencies",
+    "package:vsix": "npm run bundle:server && vsce package --no-dependencies --target \"$(node -p 'process.platform + \"-\" + process.arch')\"",
     "vscode:prepublish": "npm run compile"
   },
   "devDependencies": {
