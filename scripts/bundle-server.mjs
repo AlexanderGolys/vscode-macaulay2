@@ -1,48 +1,43 @@
-import { chmodSync, copyFileSync, mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { arch, platform } from "node:process";
-import { join, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
-import { mkdtempSync } from "node:fs";
+import { chmodSync, copyFileSync, mkdirSync, renameSync } from "node:fs";
+import { join } from "node:path";
 
-const repository = resolve(import.meta.dirname, "..");
-const manifest = JSON.parse(readFileSync(join(repository, "package.json"), "utf8"));
-const { serverCrate, serverVersion } = manifest.serverBundle;
-const staging = mkdtempSync(join(tmpdir(), "vscode-macaulay2-server-"));
-const executable = platform === "win32" ? `${serverCrate}.exe` : serverCrate;
-const destinationDirectory = join(repository, "bin", `${platform}-${arch}`);
+import {
+  crossCompilationPath,
+  repository,
+  run,
+  serverExecutable,
+  serverSource,
+  serverVersion,
+  targets,
+} from "./toolchain.mjs";
 
-try {
-  const result = spawnSync(
-    "cargo",
-    [
-      "install",
-      "--locked",
-      "--root",
-      staging,
-      "--version",
-      `=${serverVersion}`,
-      serverCrate,
-    ],
-    { stdio: "inherit" },
-  );
-  if (result.error !== undefined) {
-    throw result.error;
-  }
-  if (result.status !== 0) {
-    throw new Error(`cargo install exited with status ${result.status}`);
-  }
+// Builds the pinned server release for every VS Code target in
+// `serverBundle.targets` and places each executable under `bin/<target>/`.
+// Zig links against an old glibc, so the Linux builds run on older systems
+// than the one building them.
 
+const source = await serverSource();
+const path = await crossCompilationPath();
+
+for (const [vscodeTarget, rustTarget] of Object.entries(targets)) {
+  // A `.<glibc version>` suffix is for the linker only; rustup and the build
+  // output use the plain target triple.
+  const rustTriple = rustTarget.replace(/\.[\d.]+$/, "");
+  run("rustup", ["target", "add", rustTriple]);
+  run("cargo", ["zigbuild", "--release", "--locked", "--target", rustTarget], {
+    cwd: source,
+    env: { ...process.env, PATH: path },
+  });
+
+  const executable = serverExecutable(vscodeTarget);
+  const destinationDirectory = join(repository, "bin", vscodeTarget);
   mkdirSync(destinationDirectory, { recursive: true });
   const destination = join(destinationDirectory, executable);
   // Replace by renaming, so a server still running from the previous bundle
   // keeps its executable instead of blocking the copy.
   const incoming = `${destination}.incoming`;
-  copyFileSync(join(staging, "bin", executable), incoming);
-  if (platform !== "win32") {
-    chmodSync(incoming, 0o755);
-  }
+  copyFileSync(join(source, "target", rustTriple, "release", executable), incoming);
+  chmodSync(incoming, 0o755);
   renameSync(incoming, destination);
-} finally {
-  rmSync(staging, { recursive: true, force: true });
+  console.log(`bundled ${executable} ${serverVersion} for ${vscodeTarget}`);
 }

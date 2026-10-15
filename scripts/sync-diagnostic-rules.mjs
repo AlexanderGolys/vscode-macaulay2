@@ -1,20 +1,14 @@
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { env } from "node:process";
-import { join, resolve } from "node:path";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+
+import { manifest, repository, serverCrate, serverSource, serverVersion } from "./toolchain.mjs";
 
 // Fills the choices of every setting that lists diagnostics with the rules
-// registered by the bundled server release, read from its crate source in the
-// Cargo registry (downloaded by `bundle:server`).
+// registered by the pinned server release, read from its published source.
 
-const repository = resolve(import.meta.dirname, "..");
-const manifestPath = join(repository, "package.json");
-const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
-const { serverCrate, serverVersion } = manifest.serverBundle;
 const ruleListSettings = ["macaulay2.diagnostics.disabled"];
 
-// The registration table of the published release.
-const ruleTable = join(findCrateSource(), "src", "diagnostic_registry.rs");
+const ruleTable = join(await serverSource(), "src", "diagnostic_registry.rs");
 if (!existsSync(ruleTable)) {
   throw new Error(`no diagnostic registration table at ${ruleTable}`);
 }
@@ -35,26 +29,10 @@ for (const setting of declaredRuleLists) {
   properties[setting].items.enum = ruleSelectors;
   properties[setting].items.markdownEnumDescriptions = selectorDescriptions;
 }
-writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+writeFileSync(join(repository, "package.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 console.log(
   `${rules.length} rules from ${serverCrate} ${serverVersion} -> ${declaredRuleLists.join(", ")}`,
 );
-
-function findCrateSource() {
-  const registrySources = join(env.CARGO_HOME ?? join(homedir(), ".cargo"), "registry", "src");
-  const crateDirectory = `${serverCrate}-${serverVersion}`;
-  const candidates = existsSync(registrySources)
-    ? readdirSync(registrySources)
-        .map((index) => join(registrySources, index, crateDirectory))
-        .filter((path) => existsSync(path))
-    : [];
-  if (candidates.length === 0) {
-    throw new Error(
-      `${crateDirectory} is not in ${registrySources}; run \`npm run bundle:server\` first`,
-    );
-  }
-  return candidates[0];
-}
 
 // Each registration is a doc comment followed by an entry naming its `code`
 // and `name`; the first paragraph of the doc comment summarizes the rule.
@@ -79,7 +57,11 @@ function readRegisteredRules(source) {
     entry.code ??= line.match(/\bcode: "([A-Z]\d{2})"/)?.[1];
     entry.name ??= line.match(/\bname: "([a-z][a-z-]*)"/)?.[1];
     if (entry.code !== undefined && entry.name !== undefined) {
-      rules.push({ code: entry.code, name: entry.name, summary: summarize(entry.documentation ?? []) });
+      rules.push({
+        code: entry.code,
+        name: entry.name,
+        summary: summarize(entry.documentation ?? []),
+      });
       entry = {};
     }
   }

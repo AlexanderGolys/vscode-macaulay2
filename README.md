@@ -27,7 +27,7 @@ npm run compile
 npm run bundle:server
 ```
 
-`bundle:server` installs `m2-ls` 1.2.0 from crates.io with Cargo and places the executable under `bin/<platform>-<arch>/`. That server release pins the published `tree-sitter-macaulay2` grammar. Press `F5` in VS Code to launch an Extension Development Host after compiling.
+`bundle:server` downloads the `m2-ls` 1.2.0 source from crates.io and builds it for every target listed in `serverBundle.targets` of `package.json`, placing each executable under `bin/<platform>-<arch>/`. It cross-compiles with `cargo-zigbuild`, linking the Linux builds against glibc 2.28 so they run on distributions back to Debian 10 and Ubuntu 20.04. Zig and `cargo-zigbuild` are fetched into `.toolchain/` on first use at the versions pinned in `serverBundle`; Cargo and rustup are the only prerequisites. That server release pins the published `tree-sitter-macaulay2` grammar. Press `F5` in VS Code to launch an Extension Development Host after compiling.
 
 During development, if no bundled executable exists, the extension runs `m2-ls` from `PATH`. Set `macaulay2.server.path` to test a specific build and `macaulay2.server.arguments` for additional command-line arguments.
 
@@ -37,7 +37,7 @@ During development, if no bundled executable exists, the extension runs `m2-ls` 
 
 Run `npm run check` for a strict TypeScript check. Use `macaulay2.trace.server` to inspect LSP traffic when diagnosing protocol integration.
 
-Run `npm run package:vsix` to bundle the current platform's server and create an installable VSIX.
+Run `npm run package:vsix` to bundle the servers and create one installable VSIX per target, each containing only the server for its platform.
 
 ## License
 

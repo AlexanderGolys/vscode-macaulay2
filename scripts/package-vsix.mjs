@@ -1,19 +1,25 @@
-import { spawnSync } from "node:child_process";
-import { arch, platform } from "node:process";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 
-// Packages a VSIX restricted to the platform whose server `bundle:server`
-// placed under `bin/<platform>-<arch>/`; VS Code names its targets the same way.
+import { repository, run, serverExecutable, targets } from "./toolchain.mjs";
 
-const repository = resolve(import.meta.dirname, "..");
-const target = `${platform}-${arch}`;
+// Packages one VSIX per VS Code target in `serverBundle.targets`, each holding
+// only the server built for that target.
 
-const result = spawnSync(
-  "npx",
-  ["vsce", "package", "--no-dependencies", "--target", target],
-  { cwd: repository, stdio: "inherit" },
-);
-if (result.error !== undefined) {
-  throw result.error;
+const packagingDirectory = join(repository, ".toolchain", "packaging");
+mkdirSync(packagingDirectory, { recursive: true });
+const sharedIgnores = readFileSync(join(repository, ".vscodeignore"), "utf8");
+
+for (const vscodeTarget of Object.keys(targets)) {
+  const server = join(repository, "bin", vscodeTarget, serverExecutable(vscodeTarget));
+  if (!existsSync(server)) {
+    throw new Error(`${server} is missing; run \`npm run bundle:server\` first`);
+  }
+  const ignoreFile = join(packagingDirectory, `${vscodeTarget}.vscodeignore`);
+  writeFileSync(ignoreFile, `${sharedIgnores}bin/**\n!bin/${vscodeTarget}/**\n`);
+  run(
+    "npx",
+    ["vsce", "package", "--no-dependencies", "--target", vscodeTarget, "--ignoreFile", ignoreFile],
+    { cwd: repository },
+  );
 }
-process.exit(result.status ?? 1);
