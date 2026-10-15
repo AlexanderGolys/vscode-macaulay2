@@ -9,3 +9,4 @@ AGENTS.md
 .agents/
 .codex/
 .vscode-test/
+.claude/

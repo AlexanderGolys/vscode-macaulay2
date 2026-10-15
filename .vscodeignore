@@ -12,3 +12,4 @@ AGENTS.md
 test/**
 .vscode-test/**
 dist/test/**
+.claude/**
