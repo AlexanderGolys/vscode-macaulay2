@@ -8,3 +8,4 @@ bin/
 AGENTS.md
 .agents/
 .codex/
+.vscode-test/

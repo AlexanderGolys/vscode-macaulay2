@@ -45,6 +45,12 @@
         "configuration": "./language-configuration.json"
       }
     ],
+    "configurationDefaults": {
+      "[macaulay2]": {
+        "editor.semanticHighlighting.enabled": true,
+        "editor.inlayHints.enabled": "offUnlessPressed"
+      }
+    },
     "configuration": {
       "title": "Macaulay2",
       "properties": {
@@ -73,6 +79,195 @@
           "default": "off",
           "scope": "window",
           "description": "Trace communication between VS Code and m2-ls."
+        },
+        "macaulay2.diagnostics.enabled": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Show diagnostics. When disabled, no diagnostic is reported."
+        },
+        "macaulay2.diagnostics.disabled": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "syntax-error",
+              "missing-node",
+              "ambiguous-float-member-access",
+              "multiple-assignment-targets",
+              "colon-equal-part-assignment",
+              "parallel-assignment-arity",
+              "option-key-convention",
+              "unused-binding",
+              "redundant-control-parentheses",
+              "prefer-coalescence",
+              "simplifiable-expression",
+              "ring-variable-naming",
+              "install-no-effect",
+              "operator-not-flexible",
+              "install-arity",
+              "install-needs-colon-equals",
+              "protect-assigned-symbol",
+              "protect-computed-symbol",
+              "invalid-control-transfer",
+              "explicit-install-required",
+              "parallel-assignment-type",
+              "condition-type",
+              "install-codomain-missing",
+              "install-codomain-mismatch",
+              "X01",
+              "X02",
+              "X03",
+              "X04",
+              "X05",
+              "X06",
+              "S01",
+              "S02",
+              "S03",
+              "S04",
+              "S05",
+              "S06",
+              "E01",
+              "E02",
+              "E03",
+              "E04",
+              "E05",
+              "E06",
+              "E08",
+              "E09",
+              "T01",
+              "T02",
+              "T03",
+              "T04"
+            ],
+            "markdownEnumDescriptions": [
+              "`X01`: Source the grammar cannot parse.",
+              "`X02`: A token the grammar expected but did not find, such as an `if` that ends after `then`.",
+              "`X03`: `L.1` reads as `L` applied to the float `.1`, not as member access; the fix suggests `L#1`.",
+              "`X04`: A parallel assignment target M2 cannot assign. Targets are assigned component-wise and may be symbols, nested lists, parts such as `x#i` (with `=`), or installation targets such as `T + T` or `f ZZ`; under `:=` an operator target must be an installation, so a literal operand rules it out.",
+              "`X05`: `:=` used to assign a part; parts are assigned with `=`.",
+              "`X06`: A parallel assignment whose two sides list different numbers of elements.",
+              "`S01`: A lowercase option key in a call; Macaulay2 option names are capitalized.",
+              "`S02`: A local binding that is never read. Names starting with `_` are exempt.",
+              "`S03`: Parentheses around a condition, `try` value, or loop range that the keyword already delimits.",
+              "`S04`: A null test that `??` expresses directly; here `x ?? 0`.",
+              "`S05`: An `if` or `try` with a shorter equivalent form: a redundant `null` branch, a negated condition, or a nesting that flattens into an `else if` chain.",
+              "`S06`: A multi-character ring variable such as `x0`, which is a separate symbol rather than the indexed variable `x_0`.",
+              "`E01`: A method installed on something that does not dispatch to it: a plain function rather than a `method()`, the binary form of `??`, or a `<-` method for anything but one non-symbol type. M2 evaluates `x <- v` by assigning a symbol `x` directly and otherwise calling the one-type method of `class x`, yet `installMethod` accepts every other domain.",
+              "`E02`: A method installed on an operator form Macaulay2 does not let users extend.",
+              "`E03`: A method function whose parameter count differs from the installed domain.",
+              "`E04`: A method installed with `=`, which Macaulay2 rejects; installations use `:=`.",
+              "`E05`: `protect x` on a bound name protects whatever symbol `x` evaluates to; `protect symbol x` protects `x` itself.",
+              "`E06`: `protect` applied to an expression, so the protected symbol is only known at run time.",
+              "`E08`: `return`, `break`, or `continue` outside the function or loop it needs.",
+              "`E09`: `x <- y` used as an assignment target, alone or inside a parallel assignment. That never installs a callable method, so it is always an error; `<-` is overloaded only with `installMethod(symbol <-, Type, function)`.",
+              "`T01`: A parallel assignment whose right side has a type that cannot supply several values.",
+              "`T02`: An `if` or `while` condition whose type is known not to be `Boolean`.",
+              "`T03`: A method installation without a codomain where inference can deduce one; the fix inserts `ZZ =>` here.",
+              "`T04`: A method installation whose declared codomain contradicts the inferred result type.",
+              "`syntax-error`: Source the grammar cannot parse.",
+              "`missing-node`: A token the grammar expected but did not find, such as an `if` that ends after `then`.",
+              "`ambiguous-float-member-access`: `L.1` reads as `L` applied to the float `.1`, not as member access; the fix suggests `L#1`.",
+              "`multiple-assignment-targets`: A parallel assignment target M2 cannot assign. Targets are assigned component-wise and may be symbols, nested lists, parts such as `x#i` (with `=`), or installation targets such as `T + T` or `f ZZ`; under `:=` an operator target must be an installation, so a literal operand rules it out.",
+              "`colon-equal-part-assignment`: `:=` used to assign a part; parts are assigned with `=`.",
+              "`parallel-assignment-arity`: A parallel assignment whose two sides list different numbers of elements.",
+              "`option-key-convention`: A lowercase option key in a call; Macaulay2 option names are capitalized.",
+              "`unused-binding`: A local binding that is never read. Names starting with `_` are exempt.",
+              "`redundant-control-parentheses`: Parentheses around a condition, `try` value, or loop range that the keyword already delimits.",
+              "`prefer-coalescence`: A null test that `??` expresses directly; here `x ?? 0`.",
+              "`simplifiable-expression`: An `if` or `try` with a shorter equivalent form: a redundant `null` branch, a negated condition, or a nesting that flattens into an `else if` chain.",
+              "`ring-variable-naming`: A multi-character ring variable such as `x0`, which is a separate symbol rather than the indexed variable `x_0`.",
+              "`install-no-effect`: A method installed on something that does not dispatch to it: a plain function rather than a `method()`, the binary form of `??`, or a `<-` method for anything but one non-symbol type. M2 evaluates `x <- v` by assigning a symbol `x` directly and otherwise calling the one-type method of `class x`, yet `installMethod` accepts every other domain.",
+              "`operator-not-flexible`: A method installed on an operator form Macaulay2 does not let users extend.",
+              "`install-arity`: A method function whose parameter count differs from the installed domain.",
+              "`install-needs-colon-equals`: A method installed with `=`, which Macaulay2 rejects; installations use `:=`.",
+              "`protect-assigned-symbol`: `protect x` on a bound name protects whatever symbol `x` evaluates to; `protect symbol x` protects `x` itself.",
+              "`protect-computed-symbol`: `protect` applied to an expression, so the protected symbol is only known at run time.",
+              "`invalid-control-transfer`: `return`, `break`, or `continue` outside the function or loop it needs.",
+              "`explicit-install-required`: `x <- y` used as an assignment target, alone or inside a parallel assignment. That never installs a callable method, so it is always an error; `<-` is overloaded only with `installMethod(symbol <-, Type, function)`.",
+              "`parallel-assignment-type`: A parallel assignment whose right side has a type that cannot supply several values.",
+              "`condition-type`: An `if` or `while` condition whose type is known not to be `Boolean`.",
+              "`install-codomain-missing`: A method installation without a codomain where inference can deduce one; the fix inserts `ZZ =>` here.",
+              "`install-codomain-mismatch`: A method installation whose declared codomain contradicts the inferred result type."
+            ]
+          },
+          "uniqueItems": true,
+          "default": [],
+          "scope": "window",
+          "markdownDescription": "Diagnostics to hide, by name (e.g. `unused-binding`) or code (e.g. `S02`)."
+        },
+        "macaulay2.formatting.indentWidth": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "default": null,
+          "scope": "window",
+          "markdownDescription": "Spaces per indentation level. Leave unset to use the editor's indentation."
+        },
+        "macaulay2.formatting.useTabs": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "default": null,
+          "scope": "window",
+          "markdownDescription": "Indent with tabs. Leave unset to use the editor's indentation."
+        },
+        "macaulay2.formatting.softLineWidth": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 100,
+          "scope": "window",
+          "markdownDescription": "Line width the formatter prefers to wrap at. `0` disables preferred wrapping."
+        },
+        "macaulay2.formatting.hardLineWidth": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 100,
+          "scope": "window",
+          "markdownDescription": "Line width the formatter always wraps at. `0` disables forced wrapping."
+        },
+        "macaulay2.formatting.controlFlowLayout": {
+          "type": "string",
+          "enum": [
+            "compact",
+            "multiline",
+            "multilineCompactElse"
+          ],
+          "enumDescriptions": [
+            "Leave control flow on the lines it is written on.",
+            "Start each clause (then, else, do, list, …) and each body on its own line.",
+            "Like multiline, but keep the final else value on the else line."
+          ],
+          "default": "multilineCompactElse",
+          "scope": "window",
+          "description": "Layout of if/then/else expressions and loops."
+        },
+        "macaulay2.formatting.compactFactorOperators": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "markdownDescription": "Write factor operators without spaces, e.g. `2*x` instead of `2 * x`."
+        },
+        "macaulay2.formatting.breakAfterSemicolon": {
+          "type": "boolean",
+          "default": true,
+          "scope": "window",
+          "description": "Start the expression after a semicolon on a new line."
+        },
+        "macaulay2.inlayHints.expressionTypes": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "Show the types of arguments, subexpressions, and call results."
+        },
+        "macaulay2.inlayHints.allKnownTypes": {
+          "type": "boolean",
+          "default": false,
+          "scope": "window",
+          "description": "Also show types that are obvious from literals."
         }
       }
     }
@@ -82,20 +277,25 @@
     "compile": "esbuild src/extension.ts --bundle --platform=node --format=cjs --external:vscode --outfile=dist/extension.js --sourcemap",
     "watch": "npm run compile -- --watch",
     "check": "tsc -p tsconfig.json --noEmit",
-    "bundle:server": "node scripts/bundle-server.mjs",
+    "compile:test": "esbuild test/runTests.ts test/openEditor.ts test/suite/index.ts --bundle --platform=node --format=cjs --external:vscode --external:@vscode/test-electron --outdir=dist/test --sourcemap",
+    "test": "npm run compile && npm run compile:test && node dist/test/runTests.js",
+    "try": "npm run compile && npm run compile:test && node dist/test/openEditor.js",
+    "bundle:server": "node scripts/bundle-server.mjs && npm run sync:settings",
+    "sync:settings": "node scripts/sync-diagnostic-rules.mjs",
     "package:vsix": "npm run bundle:server && vsce package --no-dependencies",
     "vscode:prepublish": "npm run compile"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@types/vscode": "^1.91.0",
+    "@vscode/test-electron": "^3.1.0",
     "@vscode/vsce": "^3.9.2",
     "esbuild": "^0.25.0",
-    "vscode-languageclient": "^10.1.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vscode-languageclient": "^10.1.0"
   },
   "serverBundle": {
     "serverCrate": "m2-ls",
-    "serverVersion": "0.1.0"
+    "serverVersion": "1.2.0"
   }
 }

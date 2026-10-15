@@ -1,4 +1,4 @@
-import { chmodSync, copyFileSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { chmodSync, copyFileSync, mkdirSync, readFileSync, renameSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { arch, platform } from "node:process";
 import { join, resolve } from "node:path";
@@ -35,10 +35,14 @@ try {
 
   mkdirSync(destinationDirectory, { recursive: true });
   const destination = join(destinationDirectory, executable);
-  copyFileSync(join(staging, "bin", executable), destination);
+  // Replace by renaming, so a server still running from the previous bundle
+  // keeps its executable instead of blocking the copy.
+  const incoming = `${destination}.incoming`;
+  copyFileSync(join(staging, "bin", executable), incoming);
   if (platform !== "win32") {
-    chmodSync(destination, 0o755);
+    chmodSync(incoming, 0o755);
   }
+  renameSync(incoming, destination);
 } finally {
   rmSync(staging, { recursive: true, force: true });
 }

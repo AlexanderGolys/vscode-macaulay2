@@ -9,3 +9,6 @@ tsconfig.json
 AGENTS.md
 *.vsix
 *.log
+test/**
+.vscode-test/**
+dist/test/**
