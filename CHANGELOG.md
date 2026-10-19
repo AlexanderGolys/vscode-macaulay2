@@ -2,6 +2,10 @@
 
 All notable changes to this extension will be documented here.
 
+## 1.0.4
+
+- Use the Macaulay2 logo as the extension icon.
+
 ## 1.0.3
 
 - Add an extension icon.
