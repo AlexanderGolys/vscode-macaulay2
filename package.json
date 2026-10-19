@@ -3,7 +3,7 @@
   "displayName": "Macaulay2",
   "description": "Macaulay2 language support powered by m2-ls",
   "version": "0.1.0",
-  "publisher": "alexandergolys",
+  "publisher": "AlexanderGolys",
   "license": "MIT",
   "repository": {
     "type": "git",
