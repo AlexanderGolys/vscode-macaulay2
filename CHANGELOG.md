@@ -2,6 +2,10 @@
 
 All notable changes to this extension will be documented here.
 
+## 1.0.2
+
+- Rename the extension to Macaulay2 Language Server.
+
 ## 1.0.1
 
 - Bundle `m2-ls` 1.2.0 for macOS and Windows on x64 and arm64.
