@@ -1,8 +1,8 @@
 {
   "name": "macaulay2-language-server",
-  "displayName": "Macaulay2 Language Server",
+  "displayName": "Macaulay2 Language Server (m2-ls)",
   "description": "Macaulay2 language support powered by m2-ls",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "publisher": "AlexanderGolys",
   "icon": "images/icon.png",
   "license": "MIT",

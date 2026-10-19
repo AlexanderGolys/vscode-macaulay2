@@ -2,6 +2,10 @@
 
 All notable changes to this extension will be documented here.
 
+## 1.0.6
+
+- Rename the extension to Macaulay2 Language Server (m2-ls).
+
 ## 1.0.5
 
 - Publish under the extension ID `AlexanderGolys.macaulay2-language-server`.
