@@ -2,7 +2,7 @@
 
 All notable changes to this extension will be documented here.
 
-## 0.1.0
+## 1.0.0
 
 - Add Macaulay2 language registration and editor configuration.
 - Connect VS Code to `m2-ls` through the standard language client.
