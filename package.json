@@ -1,6 +1,6 @@
 {
   "name": "vscode-macaulay2",
-  "displayName": "Macaulay2",
+  "displayName": "Macaulay2 Language Server",
   "description": "Macaulay2 language support powered by m2-ls",
   "version": "1.0.1",
   "publisher": "AlexanderGolys",
