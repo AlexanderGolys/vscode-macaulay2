@@ -6,7 +6,7 @@ import * as vscode from "vscode";
 // Each check exercises one server feature through the editor's own commands,
 // the same path a user's request takes.
 
-const extensionId = "AlexanderGolys.vscode-macaulay2";
+const extensionId = "AlexanderGolys.macaulay2-language-server";
 const sampleFile = "sample.m2";
 const serverResponseTimeout = 30_000;
 

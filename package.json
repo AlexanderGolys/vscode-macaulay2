@@ -1,8 +1,8 @@
 {
-  "name": "vscode-macaulay2",
+  "name": "macaulay2-language-server",
   "displayName": "Macaulay2 Language Server",
   "description": "Macaulay2 language support powered by m2-ls",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "publisher": "AlexanderGolys",
   "icon": "images/icon.png",
   "license": "MIT",
