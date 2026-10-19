@@ -2,6 +2,10 @@
 
 All notable changes to this extension will be documented here.
 
+## 1.0.3
+
+- Add an extension icon.
+
 ## 1.0.2
 
 - Rename the extension to Macaulay2 Language Server.
