@@ -1,44 +1,99 @@
-# Macaulay2 for VS Code
+# Macaulay2 LSP
 
-This extension exposes `m2-ls` in Visual Studio Code through the standard Language Server Protocol client. The client forwards the capabilities advertised by the server:
+[![VS Marketplace](https://vsmarketplacebadges.dev/version-short/AlexanderGolys.macaulay2-language-server.svg)](https://marketplace.visualstudio.com/items?itemName=AlexanderGolys.macaulay2-language-server)
+[![Installs](https://vsmarketplacebadges.dev/installs-short/AlexanderGolys.macaulay2-language-server.svg)](https://marketplace.visualstudio.com/items?itemName=AlexanderGolys.macaulay2-language-server)
+[![GitHub release](https://img.shields.io/github/v/release/AlexanderGolys/vscode-macaulay2)](https://github.com/AlexanderGolys/vscode-macaulay2/releases/latest)
+[![m2-ls](https://img.shields.io/crates/v/m2-ls?label=m2-ls)](https://crates.io/crates/m2-ls)
+[![License](https://img.shields.io/github/license/AlexanderGolys/vscode-macaulay2)](LICENSE)
 
-- definitions, references, renaming, hover, and document highlights;
-- document and workspace symbols;
-- completions, folding ranges, code actions, and diagnostics;
-- formatting, semantic tokens, and inlay hints.
+Language support for [Macaulay2](https://macaulay2.com) in Visual Studio Code, powered by the
+[`m2-ls`](https://github.com/AlexanderGolys/m2-ls) language server. The server ships inside the
+extension, so `.m2` files work out of the box with nothing else to install.
 
-The server also owns the Tree-sitter-based syntax layer; the extension does not duplicate Macaulay2 analysis. Highlighting therefore comes entirely from semantic tokens, which the extension enables for Macaulay2 files regardless of the color theme.
+## Features
+
+- **Highlighting** that understands Macaulay2 syntax, from a Tree-sitter grammar refined by
+  semantic analysis. It works with every color theme.
+- **Navigation:** go to definition, find references, document highlights, and document and
+  workspace symbols.
+- **Hover documentation** for the symbol under the cursor.
+- **Completion**, including Macaulay2's builtin names.
+- **Rename** a binding across its uses.
+- **Diagnostics** with quick fixes, each rule individually silenceable.
+- **Formatting** with configurable indentation, line widths, and layout.
+- **Inlay hints** showing inferred types, off until you ask for them.
+- **Folding** and bracket matching, with `--` line comments and `-* … *-` block comments.
+
+## Installation
+
+Install **Macaulay2 LSP** from the
+[Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=AlexanderGolys.macaulay2-language-server),
+or run:
+
+```bash
+code --install-extension AlexanderGolys.macaulay2-language-server
+```
+
+To install offline, download the VSIX for your platform from the
+[latest release](https://github.com/AlexanderGolys/vscode-macaulay2/releases/latest) and run
+`code --install-extension <file>.vsix`.
+
+| Platform | x64 | arm64 |
+| -------- | :-: | :---: |
+| Linux (glibc 2.28+, e.g. Debian 10, Ubuntu 20.04) | ✓ | ✓ |
+| macOS | ✓ | ✓ |
+| Windows | ✓ | ✓ |
 
 ## Settings
 
-Server settings live under `macaulay2.*` in the Settings editor and apply without a restart:
+All settings live under `macaulay2.*` and take effect without restarting.
 
-- `macaulay2.diagnostics.enabled` and `macaulay2.diagnostics.disabled`, which hides individual rules by name or code;
-- `macaulay2.formatting.*` for indentation, line widths, control-flow layout, and operator spacing;
-- `macaulay2.inlayHints.*` for the kinds of type hints the server reports.
+| Setting | Default | Description |
+| ------- | ------- | ----------- |
+| `macaulay2.diagnostics.enabled` | `true` | Report diagnostics at all. |
+| `macaulay2.diagnostics.disabled` | `[]` | Rules to hide, by name (`unused-binding`) or code (`S02`). |
+| `macaulay2.formatting.indentWidth` | editor | Spaces per indentation level. |
+| `macaulay2.formatting.useTabs` | editor | Indent with tabs. |
+| `macaulay2.formatting.softLineWidth` | `100` | Width the formatter prefers to wrap at; `0` disables. |
+| `macaulay2.formatting.hardLineWidth` | `100` | Width the formatter always wraps at; `0` disables. |
+| `macaulay2.formatting.controlFlowLayout` | `multilineCompactElse` | Layout of `if`/`then`/`else` and loops. |
+| `macaulay2.formatting.compactFactorOperators` | `false` | Write `2*x` instead of `2 * x`. |
+| `macaulay2.formatting.breakAfterSemicolon` | `true` | Start the expression after `;` on a new line. |
+| `macaulay2.inlayHints.expressionTypes` | `false` | Show types of arguments, subexpressions, and call results. |
+| `macaulay2.inlayHints.allKnownTypes` | `false` | Also show types that are obvious from literals. |
 
-Inlay hints are hidden by default in Macaulay2 files; hold `Ctrl+Alt` to show them, or set `editor.inlayHints.enabled` to `on` for `[macaulay2]`.
+Inlay hints are hidden by default in Macaulay2 files. Hold `Ctrl+Alt` to show them, or enable
+them permanently:
+
+```json
+"[macaulay2]": {
+  "editor.inlayHints.enabled": "on"
+}
+```
+
+## Troubleshooting
+
+- **Use a different server build:** set `macaulay2.server.path` to an `m2-ls` executable, and pass
+  extra flags through `macaulay2.server.arguments`.
+- **Inspect the protocol traffic:** set `macaulay2.trace.server` to `messages` or `verbose` and
+  open the *Macaulay2 Language Server* output channel.
+- **Report a problem:** open an issue on
+  [GitHub](https://github.com/AlexanderGolys/vscode-macaulay2/issues) with the file that
+  triggers it, if you can share it.
 
 ## Development
 
 ```bash
 npm install
+npm run bundle:server   # build m2-ls for every platform into bin/
 npm run compile
-npm run bundle:server
+npm test                # integration tests in a downloaded VS Code
 ```
 
-`bundle:server` downloads the `m2-ls` 1.2.0 source from crates.io and builds it for every target listed in `serverBundle.targets` of `package.json`, placing each executable under `bin/<platform>-<arch>/`. It cross-compiles with `cargo-zigbuild`, linking the Linux builds against glibc 2.28 so they run on distributions back to Debian 10 and Ubuntu 20.04. Zig and `cargo-zigbuild` are fetched into `.toolchain/` on first use at the versions pinned in `serverBundle`; Cargo and rustup are the only prerequisites. That server release pins the published `tree-sitter-macaulay2` grammar. Press `F5` in VS Code to launch an Extension Development Host after compiling.
-
-During development, if no bundled executable exists, the extension runs `m2-ls` from `PATH`. Set `macaulay2.server.path` to test a specific build and `macaulay2.server.arguments` for additional command-line arguments.
-
-`bundle:server` also runs `npm run sync:settings`, which takes the diagnostic rule choices offered by `macaulay2.diagnostics.disabled` from the bundled server release.
-
-`npm test` runs integration checks in a private VS Code instance downloaded into `.vscode-test/`; `npm run try` opens that instance with the extension loaded, for trying it by hand without installing VS Code.
-
-Run `npm run check` for a strict TypeScript check. Use `macaulay2.trace.server` to inspect LSP traffic when diagnosing protocol integration.
-
-Run `npm run package:vsix` to bundle the servers and create one installable VSIX per target, each containing only the server for its platform.
+Press `F5` to launch an Extension Development Host. See [CONTRIBUTING.md](CONTRIBUTING.md) for
+the build toolchain, packaging, and where changes belong.
 
 ## License
 
-The VS Code extension source is available under the MIT License. Packaged releases include `m2-ls`, which remains licensed under GPL-3.0-only. See `THIRD_PARTY_NOTICES.md` for dependency licensing details.
+The extension is available under the [MIT License](LICENSE). Packaged releases include `m2-ls`,
+licensed under GPL-3.0-only; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
